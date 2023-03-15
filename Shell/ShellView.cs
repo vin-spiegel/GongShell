@@ -602,7 +602,7 @@ namespace GongSolutions.Shell
                                 8 + (n * 4));
                             result[n] = new ShellItem(
                                 m_CurrentFolder,
-                                (IntPtr)((int)storage.unionmember + offset));
+                                (IntPtr)(storage.unionmember + offset));
                         }
 
                         GlobalFree(storage.unionmember);
