@@ -28,7 +28,6 @@ namespace GongSolutions.Shell
     /// </remarks>
     public class ShellTreeView : Control, Interop.IDropSource, Interop.IDropTarget
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellTreeView"/> class.
         /// </summary>
@@ -371,41 +370,48 @@ namespace GongSolutions.Shell
 
         void RefreshItem(TreeNode node)
         {
-            ShellItem folder = (ShellItem)node.Tag;
-            node.Text = folder.DisplayName;
-            SetNodeImage(node);
-
-            if (NodeHasChildren(node))
+            try
             {
-                IEnumerator<ShellItem> e = GetFolderEnumerator(folder);
-                ArrayList nodesToRemove = new ArrayList(node.Nodes);
+                ShellItem folder = (ShellItem)node.Tag;
+                node.Text = folder.DisplayName;
+                SetNodeImage(node);
 
-                while (e.MoveNext())
+                if (NodeHasChildren(node))
                 {
-                    TreeNode childNode = FindItem(e.Current, node);
+                    IEnumerator<ShellItem> e = GetFolderEnumerator(folder);
+                    ArrayList nodesToRemove = new ArrayList(node.Nodes);
 
-                    if (childNode != null)
+                    while (e.MoveNext())
                     {
-                        RefreshItem(childNode);
-                        nodesToRemove.Remove(childNode);
+                        TreeNode childNode = FindItem(e.Current, node);
+
+                        if (childNode != null)
+                        {
+                            RefreshItem(childNode);
+                            nodesToRemove.Remove(childNode);
+                        }
+                        else
+                        {
+                            CreateItem(node, e.Current);
+                        }
                     }
-                    else
+
+                    foreach (TreeNode n in nodesToRemove)
                     {
-                        CreateItem(node, e.Current);
+                        n.Remove();
                     }
                 }
-
-                foreach (TreeNode n in nodesToRemove)
+                else if (node.Nodes.Count == 0)
                 {
-                    n.Remove();
+                    if (folder.HasSubFolders)
+                    {
+                        node.Nodes.Add("");
+                    }
                 }
             }
-            else if (node.Nodes.Count == 0)
+            catch (Exception ex)
             {
-                if (folder.HasSubFolders)
-                {
-                    node.Nodes.Add("");
-                }
+                Console.WriteLine(ex);
             }
         }
 
