@@ -7,9 +7,7 @@ using GongSolutions.Shell.Interop;
 
 namespace GongSolutions.Shell
 {
-    class ShellBrowser : IShellBrowser,
-                         IOleCommandTarget,
-                         Interop.IServiceProvider
+    class ShellBrowser : IShellBrowser, IOleCommandTarget, Interop.IServiceProvider, IContextMenuModifier
     {
         public ShellBrowser(ShellView shellView)
         {
@@ -29,6 +27,16 @@ namespace GongSolutions.Shell
             }
         }
 
+        #region IContextMenuModifier
+        
+        HResult IContextMenuModifier.GetContextMenu(IContextMenu oldMenu, out IContextMenu menu)
+        {
+            menu = m_ShellView.CustomContextMenuEnable ? new ShellContextMenuModifier(m_ShellView) : oldMenu; // replace the default menu by a custom one
+            return HResult.S_OK;
+        }
+        
+        #endregion
+        
         #region IShellBrowser Members
 
         HResult IShellBrowser.GetWindow(out IntPtr phwnd)
@@ -190,6 +198,10 @@ namespace GongSolutions.Shell
                 ppvObject = Marshal.GetComInterfaceForObject(this,
                     typeof(IShellBrowser));
             }
+            else if (riid == typeof(IContextMenuModifier).GUID)
+            {
+                ppvObject = Marshal.GetComInterfaceForObject(this, typeof(IContextMenuModifier));
+            }
             else
             {
                 ppvObject = IntPtr.Zero;
@@ -205,11 +217,44 @@ namespace GongSolutions.Shell
         StatusBar m_StatusBar;
     }
 
+    /// <summary>
+    /// Context Menu Modifier
+    /// </summary>
+    public class ShellContextMenuModifier : IContextMenu
+    {
+        private readonly ShellView _shellView;
+
+        public ShellContextMenuModifier(ShellView shellView)
+        {
+            _shellView = shellView;
+        }
+
+        public HResult QueryContextMenu(IntPtr hMenu, uint indexMenu, int idCmdFirst, int idCmdLast, CMF uFlags)
+        {
+            User32.DestroyMenu(hMenu);
+        
+            if (_shellView.SelectedItems.Length > 0)
+            {
+                _shellView.ItemContextMenuStrip?.Show(_shellView, _shellView.PointToClient(Cursor.Position));    
+            }
+            else
+            {
+                _shellView.ContextMenuStrip?.Show(_shellView, _shellView.PointToClient(Cursor.Position));    
+            }
+            
+            return HResult.S_OK;
+        }
+
+        public void InvokeCommand(ref CMINVOKECOMMANDINFO pici) { }
+        
+        public HResult GetCommandString(int idcmd, uint uflags, int reserved, [MarshalAs(UnmanagedType.LPStr)] StringBuilder commandstring, int cch) => HResult.E_NOTIMPL;
+    }
+
     class DialogShellBrowser : ShellBrowser, ICommDlgBrowser
     {
         public DialogShellBrowser(ShellView shellView)
             : base(shellView) { }
-
+        
         #region ICommDlgBrowser Members
 
         HResult ICommDlgBrowser.OnDefaultCommand(IShellView ppshv)

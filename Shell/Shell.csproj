@@ -64,6 +64,7 @@
     <Compile Include="Interop\ComCtl32.cs" />
     <Compile Include="Interop\ICommDlgBrowser.cs" />
     <Compile Include="Interop\IContextMenu.cs" />
+    <Compile Include="Interop\IContextMenuModifier.cs" />
     <Compile Include="Interop\IDropSource.cs" />
     <Compile Include="Interop\IDropTarget.cs" />
     <Compile Include="Interop\IKnownFolder.cs" />

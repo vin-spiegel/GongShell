@@ -87,6 +87,7 @@ namespace GongSolutions.Shell.Interop
     [Flags]
     public enum FOLDERFLAGS : uint
     {
+        NONE = 0,
         AUTOARRANGE = 0x1,
         ABBREVIATEDNAMES = 0x2,
         SNAPTOGRID = 0x4,
@@ -105,7 +106,20 @@ namespace GongSolutions.Shell.Interop
         SINGLECLICKACTIVATE = 0x8000,
         NOWEBVIEW = 0x10000,
         HIDEFILENAMES = 0x20000,
-        CHECKSELECT = 0x40000
+        CHECKSELECT = 0x40000,
+        NOENUMREFRESH = 0x80000,
+        NOGROUPING = 0x100000,
+        FULLROWSELECT = 0x200000,
+        NOFILTERS = 0x400000,
+        NOCOLUMNHEADER = 0x800000,
+        NOHEADERINALLVIEWS = 0x1000000,
+        EXTENDEDTILES = 0x2000000,
+        TRICHECKSELECT = 0x4000000,
+        AUTOCHECKSELECT = 0x8000000,
+        NOBROWSERVIEWSTATE = 0x10000000,
+        SUBSETGROUPS = 0x20000000,
+        USESEARCHFOLDER = 0x40000000,
+        ALLOWRTLREADING = 0x80000000
     }
 
     public enum FOLDERVIEWMODE : uint

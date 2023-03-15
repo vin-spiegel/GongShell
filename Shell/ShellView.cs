@@ -475,6 +475,19 @@ namespace GongSolutions.Shell
         }
 
         /// <summary>
+        /// Window Context Menu Enable
+        /// </summary>
+        [Category("Custom")]
+        [DefaultValue(true)]
+        public bool CustomContextMenuEnable { get; set; }
+        
+        /// <summary>
+        /// ContextMenuStrip On Selected Items
+        /// </summary>
+        [Category("Custom")]
+        [DefaultValue(null)]
+        public ContextMenuStrip ItemContextMenuStrip { get; set; }
+        /// <summary>
         /// Gets a value indicating whether a new folder can be created in
         /// the folder currently being browsed by th <see cref="ShellView"/>.
         /// </summary>
