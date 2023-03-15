@@ -10,7 +10,6 @@ namespace GongSolutions.Shell
     /// </summary>
     public class ShellHistory
     {
-
         /// <summary>
         /// Clears the shell history.
         /// </summary>
@@ -58,7 +57,7 @@ namespace GongSolutions.Shell
                 }
                 else
                 {
-                    return new ShellItem[0];
+                    return Array.Empty<ShellItem>();
                 }
             }
         }
@@ -81,11 +80,7 @@ namespace GongSolutions.Shell
 
         internal ShellItem MoveBack()
         {
-            if (m_Current == 0)
-            {
-                throw new InvalidOperationException("Cannot navigate back");
-            }
-            return m_History[--m_Current];
+            return m_Current != 0 ? m_History[--m_Current] : default;
         }
 
         internal void MoveBack(ShellItem folder)
@@ -106,7 +101,8 @@ namespace GongSolutions.Shell
         {
             if (m_Current == m_History.Count - 1)
             {
-                throw new InvalidOperationException("Cannot navigate forward");
+                // throw new InvalidOperationException("Cannot navigate forward");
+                return m_History[0];
             }
             return m_History[++m_Current];
         }
