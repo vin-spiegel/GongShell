@@ -1,17 +1,25 @@
 using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Drawing;
 using System.Drawing.Design;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Windows.Forms;
 using GongSolutions.Shell.Interop;
 using ComTypes = System.Runtime.InteropServices.ComTypes;
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable SuggestVarOrType_BuiltInTypes
+// ReSharper disable SuggestVarOrType_Elsewhere
+// ReSharper disable InvertIf
+// ReSharper disable ConvertToAutoPropertyWhenPossible
+// ReSharper disable ConvertToAutoPropertyWithPrivateSetter
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable SuggestVarOrType_SimpleTypes
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable CommentTypo
+#pragma warning disable CS1574
 
 namespace GongSolutions.Shell
 {
@@ -134,8 +142,7 @@ namespace GongSolutions.Shell
 
             do
             {
-                name = string.Format("{0}\\New Folder ({1})",
-                    CurrentFolder.FileSystemPath, ++suffix);
+                name = $"{CurrentFolder.FileSystemPath}\\New Folder ({++suffix})";
             } while (Directory.Exists(name) || File.Exists(name));
 
             ERROR result = Shell32.SHCreateDirectory(m_ShellViewWindow, name);
@@ -233,7 +240,6 @@ namespace GongSolutions.Shell
         /// </remarks>
         public void Navigate(Environment.SpecialFolder location)
         {
-
             // CSIDL_MYDOCUMENTS was introduced in Windows XP but doesn't work 
             // even on that platform. Use CSIDL_PERSONAL instead.
             if (location == Environment.SpecialFolder.MyDocuments)
@@ -426,7 +432,7 @@ namespace GongSolutions.Shell
         /// </summary>
         public void RefreshContents()
         {
-            if (m_ComInterface != null) m_ComInterface.Refresh();
+            m_ComInterface?.Refresh();
         }
 
         /// <summary>
@@ -512,13 +518,7 @@ namespace GongSolutions.Shell
         /// the folder currently being browsed by th <see cref="ShellView"/>.
         /// </summary>
         [Browsable(false)]
-        public bool CanCreateFolder
-        {
-            get
-            {
-                return m_CurrentFolder.IsFileSystem && !m_CurrentFolder.IsReadOnly;
-            }
-        }
+        public bool CanCreateFolder => m_CurrentFolder.IsFileSystem && !m_CurrentFolder.IsReadOnly;
 
         /// <summary>
         /// Gets a value indicating whether a previous page in navigation 
@@ -526,10 +526,7 @@ namespace GongSolutions.Shell
         /// method to succeed. 
         /// </summary>
         [Browsable(false)]
-        public bool CanNavigateBack
-        {
-            get { return m_History.CanNavigateBack; }
-        }
+        public bool CanNavigateBack => m_History.CanNavigateBack;
 
         /// <summary>
         /// Gets a value indicating whether a subsequent page in navigation 
@@ -537,10 +534,7 @@ namespace GongSolutions.Shell
         /// method to succeed. 
         /// </summary>
         [Browsable(false)]
-        public bool CanNavigateForward
-        {
-            get { return m_History.CanNavigateForward; }
-        }
+        public bool CanNavigateForward => m_History.CanNavigateForward;
 
         /// <summary>
         /// Gets a value indicating whether the folder currently being browsed
@@ -549,22 +543,13 @@ namespace GongSolutions.Shell
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool CanNavigateParent
-        {
-            get
-            {
-                return m_CurrentFolder != ShellItem.Desktop;
-            }
-        }
+        public bool CanNavigateParent => m_CurrentFolder != ShellItem.Desktop;
 
         /// <summary>
         /// Gets the control's underlying COM IShellView interface.
         /// </summary>
         [Browsable(false)]
-        public IShellView ComInterface
-        {
-            get { return m_ComInterface; }
-        }
+        public IShellView ComInterface => m_ComInterface;
 
         /// <summary>
         /// Gets/sets a <see cref="ShellItem"/> describing the folder 
@@ -573,7 +558,7 @@ namespace GongSolutions.Shell
         [Editor(typeof(ShellItemEditor), typeof(UITypeEditor))]
         public ShellItem CurrentFolder
         {
-            get { return m_CurrentFolder; }
+            get => m_CurrentFolder;
             set
             {
                 if (value != m_CurrentFolder)
@@ -588,10 +573,7 @@ namespace GongSolutions.Shell
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ShellHistory History
-        {
-            get { return m_History; }
-        }
+        public ShellHistory History => m_History;
 
         /// <summary>
         /// Gets a list of the items currently selected in the 
@@ -608,23 +590,22 @@ namespace GongSolutions.Shell
         {
             get
             {
-                uint CFSTR_SHELLIDLIST =
-                    User32.RegisterClipboardFormat("Shell IDList Array");
-                ComTypes.IDataObject selection = GetSelectionDataObject();
+                uint CFSTR_SHELLIDLIST = User32.RegisterClipboardFormat("Shell IDList Array");
+                var selection = GetSelectionDataObject();
 
                 if (selection != null)
                 {
-                    FORMATETC format = new FORMATETC();
-                    STGMEDIUM storage = new STGMEDIUM();
-
-                    format.cfFormat = (short)CFSTR_SHELLIDLIST;
-                    format.dwAspect = DVASPECT.DVASPECT_CONTENT;
-                    format.lindex = 0;
-                    format.tymed = TYMED.TYMED_HGLOBAL;
+                    var format = new FORMATETC
+                    {
+                        cfFormat = (short)CFSTR_SHELLIDLIST,
+                        dwAspect = DVASPECT.DVASPECT_CONTENT,
+                        lindex = 0,
+                        tymed = TYMED.TYMED_HGLOBAL
+                    };
 
                     if (selection.QueryGetData(ref format) == 0)
                     {
-                        selection.GetData(ref format, out storage);
+                        selection.GetData(ref format, out var storage);
 
                         int itemCount = Marshal.ReadInt32(storage.unionmember);
                         ShellItem[] result = new ShellItem[itemCount];
@@ -642,7 +623,7 @@ namespace GongSolutions.Shell
                         return result;
                     }
                 }
-                return new ShellItem[0];
+                return Array.Empty<ShellItem>();
             }
         }
 
@@ -653,7 +634,7 @@ namespace GongSolutions.Shell
         [DefaultValue(true), Category("Behaviour")]
         public bool MultiSelect
         {
-            get { return m_MultiSelect; }
+            get => m_MultiSelect;
             set
             {
                 m_MultiSelect = value;
@@ -683,7 +664,7 @@ namespace GongSolutions.Shell
         [DefaultValue(false), Category("Appearance")]
         public bool ShowWebView
         {
-            get { return m_ShowWebView; }
+            get => m_ShowWebView;
             set
             {
                 if (value != m_ShowWebView)
@@ -702,8 +683,8 @@ namespace GongSolutions.Shell
         /// </summary>
         public StatusBar StatusBar
         {
-            get { return ((ShellBrowser)GetShellBrowser()).StatusBar; }
-            set { ((ShellBrowser)GetShellBrowser()).StatusBar = value; }
+            get => ((ShellBrowser)GetShellBrowser()).StatusBar;
+            set => ((ShellBrowser)GetShellBrowser()).StatusBar = value;
         }
 
         /// <summary>
@@ -712,7 +693,7 @@ namespace GongSolutions.Shell
         [DefaultValue(ShellViewStyle.LargeIcon), Category("Appearance")]
         public ShellViewStyle View
         {
-            get { return m_View; }
+            get => m_View;
             set
             {
                 m_View = value;
@@ -909,18 +890,12 @@ namespace GongSolutions.Shell
 
         internal void OnSelectionChanged()
         {
-            if (SelectionChanged != null)
-            {
-                SelectionChanged(this, EventArgs.Empty);
-            }
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        internal ShellItem ShellItem
-        {
-            get { return m_CurrentFolder; }
-        }
+        internal ShellItem ShellItem => m_CurrentFolder;
 
-        void CreateShellView()
+        private void CreateShellView()
         {
             IShellView previous = m_ComInterface;
             Rectangle bounds = ClientRectangle;
@@ -977,10 +952,10 @@ namespace GongSolutions.Shell
             }
 
             // Destroy the previous view window.
-            if (previous != null) previous.DestroyViewWindow();
+            previous?.DestroyViewWindow();
         }
 
-        void RecreateShellView()
+        private void RecreateShellView()
         {
             if (m_ComInterface != null)
             {
@@ -988,26 +963,23 @@ namespace GongSolutions.Shell
                 OnNavigated();
             }
 
-            if (m_PropertyChanged != null)
-            {
-                m_PropertyChanged(this,
-                    new PropertyChangedEventArgs("CurrentFolder"));
-            }
+            m_PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentFolder"));
         }
 
-        bool RenameCallback(IntPtr hwnd, IntPtr lParam)
+        private static bool RenameCallback(IntPtr hwnd, IntPtr lParam)
         {
-            int itemCount = User32.SendMessage(hwnd,
-                MSG.LVM_GETITEMCOUNT, 0, 0);
+            int itemCount = User32.SendMessage(hwnd, MSG.LVM_GETITEMCOUNT, 0, 0);
 
             for (int n = 0; n < itemCount; ++n)
             {
-                LVITEMA item = new LVITEMA();
-                item.mask = LVIF.LVIF_STATE;
-                item.iItem = n;
-                item.stateMask = LVIS.LVIS_SELECTED;
-                User32.SendMessage(hwnd, MSG.LVM_GETITEMA,
-                    0, ref item);
+                LVITEMA item = new LVITEMA
+                {
+                    mask = LVIF.LVIF_STATE,
+                    iItem = n,
+                    stateMask = LVIS.LVIS_SELECTED
+                };
+                
+                User32.SendMessage(hwnd, MSG.LVM_GETITEMA, 0, ref item);
 
                 if (item.state != 0)
                 {
@@ -1019,17 +991,15 @@ namespace GongSolutions.Shell
             return true;
         }
 
-        ComTypes.IDataObject GetSelectionDataObject()
+        private ComTypes.IDataObject GetSelectionDataObject()
         {
-            IntPtr result;
-
             if (m_ComInterface == null)
             {
                 return null;
             }
 
             m_ComInterface.GetItemObject(SVGIO.SVGIO_SELECTION,
-                typeof(ComTypes.IDataObject).GUID, out result);
+                typeof(ComTypes.IDataObject).GUID, out var result);
 
             if (result != IntPtr.Zero)
             {
@@ -1045,56 +1015,39 @@ namespace GongSolutions.Shell
             }
         }
 
-        IShellBrowser GetShellBrowser()
+        private IShellBrowser GetShellBrowser()
         {
-            if (m_Browser == null)
-            {
-                if (m_ShowWebView)
-                {
-                    m_Browser = new ShellBrowser(this);
-                }
-                else
-                {
-                    m_Browser = new DialogShellBrowser(this);
-                }
-            }
-            return m_Browser;
+            return m_Browser ??= m_ShowWebView ? new ShellBrowser(this) : new DialogShellBrowser(this);
         }
 
-        void OnNavigated()
+        private void OnNavigated()
         {
-            if (Navigated != null)
-            {
-                Navigated(this, EventArgs.Empty);
-            }
+            Navigated?.Invoke(this, EventArgs.Empty);
         }
 
-        bool ShouldSerializeCurrentFolder()
+        private bool ShouldSerializeCurrentFolder()
         {
             return m_CurrentFolder != ShellItem.Desktop;
         }
 
-        static IShellView CreateViewObject(ShellItem folder, IntPtr hwndOwner)
+        private static IShellView CreateViewObject(ShellItem folder, IntPtr hwndOwner)
         {
-            IntPtr result = folder.GetIShellFolder().CreateViewObject(hwndOwner,
-                typeof(IShellView).GUID);
-            return (IShellView)
-                Marshal.GetTypedObjectForIUnknown(result,
-                    typeof(IShellView));
+            IntPtr result = folder.GetIShellFolder().CreateViewObject(hwndOwner, typeof(IShellView).GUID);
+            return (IShellView)Marshal.GetTypedObjectForIUnknown(result, typeof(IShellView));
         }
 
         [DllImport("kernel32.dll")]
-        static extern IntPtr GlobalFree(IntPtr hMem);
+        private static extern IntPtr GlobalFree(IntPtr hMem);
 
-        bool m_MultiSelect;
-        ShellHistory m_History;
-        ShellBrowser m_Browser;
-        ShellItem m_CurrentFolder;
-        IShellView m_ComInterface;
-        IntPtr m_ShellViewWindow;
-        bool m_ShowWebView;
-        ShellViewStyle m_View;
-        PropertyChangedEventHandler m_PropertyChanged;
+        private bool m_MultiSelect;
+        readonly ShellHistory m_History;
+        private ShellBrowser m_Browser;
+        private ShellItem m_CurrentFolder;
+        private IShellView m_ComInterface;
+        private IntPtr m_ShellViewWindow;
+        private bool m_ShowWebView;
+        private ShellViewStyle m_View;
+        private PropertyChangedEventHandler m_PropertyChanged;
         private bool m_NoColumnHeader;
     }
 
@@ -1113,29 +1066,19 @@ namespace GongSolutions.Shell
         /// </param>
         internal FilterItemEventArgs(ShellItem item)
         {
-            m_Item = item;
+            Item = item;
         }
 
         /// <summary>
         /// Gets/sets a value which will determine whether the item will be
         /// included in the <see cref="ShellView"/>.
         /// </summary>
-        public bool Include
-        {
-            get { return m_Include; }
-            set { m_Include = value; }
-        }
+        public bool Include { get; set; } = true;
 
         /// <summary>
         /// The item to be filtered.
         /// </summary>
-        public ShellItem Item
-        {
-            get { return m_Item; }
-        }
-
-        ShellItem m_Item;
-        bool m_Include = true;
+        public ShellItem Item { get; }
     }
 
     /// <summary>
@@ -1154,30 +1097,19 @@ namespace GongSolutions.Shell
         /// </param>
         public NavigatingEventArgs(ShellItem folder)
         {
-            m_Folder = folder;
+            Folder = folder;
         }
 
         /// <summary>
         /// Gets/sets a value indicating whether the navigation should be
         /// cancelled.
         /// </summary>
-        public bool Cancel
-        {
-            get { return m_Cancel; }
-            set { m_Cancel = value; }
-        }
+        public bool Cancel { get; set; }
 
         /// <summary>
         /// The folder being navigated to.
         /// </summary>
-        public ShellItem Folder
-        {
-            get { return m_Folder; }
-            set { m_Folder = value; }
-        }
-
-        bool m_Cancel;
-        ShellItem m_Folder;
+        public ShellItem Folder { get; set; }
     }
 
     /// <summary>

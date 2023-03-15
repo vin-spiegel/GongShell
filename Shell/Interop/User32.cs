@@ -112,6 +112,7 @@ namespace GongSolutions.Shell.Interop
         MIM_APPLYTOSUBMENUS = 0x80000000,
     }
 
+    [Flags]
     public enum MK
     {
         MK_LBUTTON = 0x0001,

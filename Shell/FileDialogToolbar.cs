@@ -78,8 +78,8 @@ namespace GongSolutions.Shell
         /// </summary>
         public event FilterItemEventHandler FilterItem
         {
-            add { shellComboBox.FilterItem += value; }
-            remove { shellComboBox.FilterItem -= value; }
+            add => shellComboBox.FilterItem += value;
+            remove => shellComboBox.FilterItem -= value;
         }
 
         bool ShouldSerializeRootFolder()

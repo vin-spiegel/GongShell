@@ -4,16 +4,16 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using GongSolutions.Shell.Interop;
+// ReSharper disable ArrangeTypeMemberModifiers
 
 namespace GongSolutions.Shell
 {
-    class SystemImageList
+    internal class SystemImageList
     {
-        public static void DrawSmallImage(Graphics g, Point point,
-                                          int imageIndex, bool selected)
+        public static void DrawSmallImage(Graphics g, Point point, int imageIndex, bool selected)
         {
-            uint flags = (uint)(imageIndex >> 16);
-            IntPtr hdc = g.GetHdc();
+            var flags = (uint)(imageIndex >> 16);
+            var hdc = g.GetHdc();
 
             try
             {
@@ -29,26 +29,16 @@ namespace GongSolutions.Shell
 
         public static void UseSystemImageList(ListView control)
         {
-            IntPtr large, small;
-            int x, y;
-
-            if (control.LargeImageList == null)
-            {
-                control.LargeImageList = new ImageList();
-            }
-
-            if (control.SmallImageList == null)
-            {
-                control.SmallImageList = new ImageList();
-            }
+            control.LargeImageList ??= new ImageList();
+            control.SmallImageList ??= new ImageList();
 
             Shell32.FileIconInit(true);
-            if (!Shell32.Shell_GetImageLists(out large, out small))
+            if (!Shell32.Shell_GetImageLists(out var large, out var small))
             {
                 throw new Exception("Failed to get system image list");
             }
 
-            ComCtl32.ImageList_GetIconSize(large, out x, out y);
+            ComCtl32.ImageList_GetIconSize(large, out var x, out var y);
             control.LargeImageList.ImageSize = new Size(x, y);
             ComCtl32.ImageList_GetIconSize(small, out x, out y);
             control.SmallImageList.ImageSize = new Size(x, y);
@@ -65,7 +55,7 @@ namespace GongSolutions.Shell
                 0, SmallImageList);
         }
 
-        static void InitializeImageLists()
+        private static void InitializeImageLists()
         {
             Shell32.FileIconInit(true);
             if (!Shell32.Shell_GetImageLists(out m_LargeImageList,

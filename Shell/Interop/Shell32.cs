@@ -135,6 +135,7 @@ namespace GongSolutions.Shell.Interop
         LAST = 7
     }
 
+    [Flags]
     public enum SHCONTF
     {
         FOLDERS = 0x0020,

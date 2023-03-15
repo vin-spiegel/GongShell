@@ -4,13 +4,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using GongSolutions.Shell.Interop;
-using Interop = GongSolutions.Shell.Interop;
 using ComTypes = System.Runtime.InteropServices.ComTypes;
+// ReSharper disable InvertIf
+// ReSharper disable SuggestVarOrType_SimpleTypes
+// ReSharper disable SuggestVarOrType_Elsewhere
+// ReSharper disable LoopCanBeConvertedToQuery
+// ReSharper disable IdentifierTypo
+// ReSharper disable SuggestVarOrType_BuiltInTypes
+// ReSharper disable InconsistentNaming
+// ReSharper disable ConvertToAutoPropertyWhenPossible
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace GongSolutions.Shell
 {
@@ -85,24 +92,18 @@ namespace GongSolutions.Shell
         [DefaultValue(false)]
         public override bool AllowDrop
         {
-            get { return m_AllowDrop; }
+            get => m_AllowDrop;
             set
             {
-                if (value != m_AllowDrop)
-                {
-                    m_AllowDrop = value;
+                if (value == m_AllowDrop) 
+                    return;
+                
+                m_AllowDrop = value;
 
-                    if (m_AllowDrop)
-                    {
-                        Marshal.ThrowExceptionForHR(
-                            Ole32.RegisterDragDrop(m_TreeView.Handle, this));
-                    }
-                    else
-                    {
-                        Marshal.ThrowExceptionForHR(
-                            Ole32.RevokeDragDrop(m_TreeView.Handle));
-                    }
-                }
+                Marshal.ThrowExceptionForHR(
+                    m_AllowDrop
+                        ? Ole32.RegisterDragDrop(m_TreeView.Handle, this)
+                        : Ole32.RevokeDragDrop(m_TreeView.Handle));
             }
         }
 
@@ -114,8 +115,8 @@ namespace GongSolutions.Shell
         [Category("Appearance")]
         public bool HotTracking
         {
-            get { return m_TreeView.HotTracking; }
-            set { m_TreeView.HotTracking = value; }
+            get => m_TreeView.HotTracking;
+            set => m_TreeView.HotTracking = value;
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace GongSolutions.Shell
         [Category("Appearance")]
         public ShellItem RootFolder
         {
-            get { return m_RootFolder; }
+            get => m_RootFolder;
             set
             {
                 m_RootFolder = value;
@@ -140,7 +141,7 @@ namespace GongSolutions.Shell
         [DefaultValue(null), Category("Behaviour")]
         public ShellView ShellView
         {
-            get { return m_ShellView; }
+            get => m_ShellView;
             set
             {
                 if (m_ShellView != null)
@@ -167,8 +168,8 @@ namespace GongSolutions.Shell
         [Editor(typeof(ShellItemEditor), typeof(UITypeEditor))]
         public ShellItem SelectedFolder
         {
-            get { return (ShellItem)m_TreeView.SelectedNode.Tag; }
-            set { SelectItem(value); }
+            get => (ShellItem)m_TreeView.SelectedNode.Tag;
+            set => SelectItem(value);
         }
 
         /// <summary>
@@ -178,7 +179,7 @@ namespace GongSolutions.Shell
         [DefaultValue(ShowHidden.System), Category("Appearance")]
         public ShowHidden ShowHidden
         {
-            get { return m_ShowHidden; }
+            get => m_ShowHidden;
             set
             {
                 m_ShowHidden = value;
@@ -313,7 +314,7 @@ namespace GongSolutions.Shell
 
         #endregion
 
-        void CreateItems()
+        private void CreateItems()
         {
             m_TreeView.BeginUpdate();
 
@@ -330,19 +331,11 @@ namespace GongSolutions.Shell
             }
         }
 
-        void CreateItem(TreeNode parent, ShellItem folder)
+        private void CreateItem(TreeNode parent, ShellItem folder)
         {
-            string displayName = folder.DisplayName;
-            TreeNode node;
+            var displayName = folder.DisplayName;
 
-            if (parent != null)
-            {
-                node = InsertNode(parent, folder, displayName);
-            }
-            else
-            {
-                node = m_TreeView.Nodes.Add(displayName);
-            }
+            var node = parent != null ? InsertNode(parent, folder, displayName) : m_TreeView.Nodes.Add(displayName);
 
             if (folder.HasSubFolders)
             {
@@ -353,7 +346,7 @@ namespace GongSolutions.Shell
             SetNodeImage(node);
         }
 
-        void CreateChildren(TreeNode node)
+        private void CreateChildren(TreeNode node)
         {
             if ((node.Nodes.Count == 1) && (node.Nodes[0].Tag == null))
             {
@@ -368,7 +361,7 @@ namespace GongSolutions.Shell
             }
         }
 
-        void RefreshItem(TreeNode node)
+        private void RefreshItem(TreeNode node)
         {
             try
             {
@@ -415,7 +408,7 @@ namespace GongSolutions.Shell
             }
         }
 
-        TreeNode InsertNode(TreeNode parent, ShellItem folder, string displayName)
+        private static TreeNode InsertNode(TreeNode parent, ShellItem folder, string displayName)
         {
             ShellItem parentFolder = (ShellItem)parent.Tag;
             IntPtr folderRelPidl = Shell32.ILFindLastID(folder.Pidl);
@@ -425,7 +418,7 @@ namespace GongSolutions.Shell
             {
                 ShellItem childFolder = (ShellItem)child.Tag;
                 IntPtr childRelPidl = Shell32.ILFindLastID(childFolder.Pidl);
-                short compare = parentFolder.GetIShellFolder().CompareIDs(0,
+                var compare = parentFolder.GetIShellFolder().CompareIDs(0,
                        folderRelPidl, childRelPidl);
 
                 if (compare < 0)
@@ -435,15 +428,10 @@ namespace GongSolutions.Shell
                 }
             }
 
-            if (result == null)
-            {
-                result = parent.Nodes.Add(displayName);
-            }
-
-            return result;
+            return result ??= parent.Nodes.Add(displayName);
         }
 
-        bool ShouldShowHidden()
+        private bool ShouldShowHidden()
         {
             if (m_ShowHidden == ShowHidden.System)
             {
@@ -465,14 +453,14 @@ namespace GongSolutions.Shell
             }
         }
 
-        IEnumerator<ShellItem> GetFolderEnumerator(ShellItem folder)
+        private IEnumerator<ShellItem> GetFolderEnumerator(ShellItem folder)
         {
             SHCONTF filter = SHCONTF.FOLDERS;
             if (ShouldShowHidden()) filter |= SHCONTF.INCLUDEHIDDEN;
             return folder.GetEnumerator(filter);
         }
 
-        void SetNodeImage(TreeNode node)
+        private void SetNodeImage(TreeNode node)
         {
             TVITEMW itemInfo = new TVITEMW();
             ShellItem folder = (ShellItem)node.Tag;
@@ -493,7 +481,7 @@ namespace GongSolutions.Shell
                 0, ref itemInfo);
         }
 
-        void SelectItem(ShellItem value)
+        private void SelectItem(ShellItem value)
         {
             TreeNode node = m_TreeView.Nodes[0];
             ShellItem folder = (ShellItem)node.Tag;
@@ -508,7 +496,7 @@ namespace GongSolutions.Shell
             }
         }
 
-        void SelectItem(TreeNode node, ShellItem value)
+        private void SelectItem(TreeNode node, ShellItem value)
         {
             CreateChildren(node);
 
@@ -531,7 +519,7 @@ namespace GongSolutions.Shell
             }
         }
 
-        TreeNode FindItem(ShellItem item, TreeNode parent)
+        private static TreeNode FindItem(ShellItem item, TreeNode parent)
         {
             if ((ShellItem)parent.Tag == item)
             {
@@ -553,20 +541,19 @@ namespace GongSolutions.Shell
             return null;
         }
 
-        bool NodeHasChildren(TreeNode node)
+        private static bool NodeHasChildren(TreeNode node)
         {
             return (node.Nodes.Count > 0) && (node.Nodes[0].Tag != null);
         }
 
-        void ScrollTreeView(ScrollDirection direction)
+        private void ScrollTreeView(ScrollDirection direction)
         {
-            User32.SendMessage(m_TreeView.Handle, MSG.WM_VSCROLL,
-                (int)direction, 0);
+            User32.SendMessage(m_TreeView.Handle, MSG.WM_VSCROLL, (int)direction, 0);
         }
 
-        void CheckDragScroll(Point location)
+        private void CheckDragScroll(Point location)
         {
-            int scrollArea = (int)(m_TreeView.Nodes[0].Bounds.Height * 1.5);
+            var scrollArea = (int)(m_TreeView.Nodes[0].Bounds.Height * 1.5);
             ScrollDirection scroll = ScrollDirection.None;
 
             if (location.Y < scrollArea)
@@ -594,7 +581,7 @@ namespace GongSolutions.Shell
             m_ScrollDirection = scroll;
         }
 
-        ShellItem[] ParseShellIDListArray(ComTypes.IDataObject pDataObj)
+        private ShellItem[] ParseShellIdListArray(ComTypes.IDataObject pDataObj)
         {
             List<ShellItem> result = new List<ShellItem>();
             ComTypes.FORMATETC format = new ComTypes.FORMATETC();
@@ -640,12 +627,12 @@ namespace GongSolutions.Shell
             return result.ToArray();
         }
 
-        bool ShouldSerializeRootFolder()
+        private bool ShouldSerializeRootFolder()
         {
             return m_RootFolder != ShellItem.Desktop;
         }
 
-        void m_TreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        private void m_TreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if ((m_ShellView != null) && (!m_Navigating))
             {
@@ -664,13 +651,10 @@ namespace GongSolutions.Shell
                 }
             }
 
-            if (SelectionChanged != null)
-            {
-                SelectionChanged(this, EventArgs.Empty);
-            }
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        void m_TreeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void m_TreeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             try
             {
@@ -682,17 +666,15 @@ namespace GongSolutions.Shell
             }
         }
 
-        void m_TreeView_ItemDrag(object sender, ItemDragEventArgs e)
+        private void m_TreeView_ItemDrag(object sender, ItemDragEventArgs e)
         {
             TreeNode node = (TreeNode)e.Item;
             ShellItem folder = (ShellItem)node.Tag;
-            DragDropEffects effect;
-
             Ole32.DoDragDrop(folder.GetIDataObject(), this,
-                DragDropEffects.All, out effect);
+                DragDropEffects.All, out var effect);
         }
 
-        void m_TreeView_MouseDown(object sender, MouseEventArgs e)
+        private void m_TreeView_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -700,7 +682,7 @@ namespace GongSolutions.Shell
             }
         }
 
-        void m_TreeView_MouseUp(object sender, MouseEventArgs e)
+        private void m_TreeView_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -714,24 +696,26 @@ namespace GongSolutions.Shell
             }
         }
 
-        void m_ScrollTimer_Tick(object sender, EventArgs e)
+        private void m_ScrollTimer_Tick(object sender, EventArgs e)
         {
             ScrollTreeView(m_ScrollDirection);
         }
 
-        void m_ShellListener_ItemRenamed(object sender, ShellItemChangeEventArgs e)
+        private void m_ShellListener_ItemRenamed(object sender, ShellItemChangeEventArgs e)
         {
             TreeNode node = FindItem(e.OldItem, m_TreeView.Nodes[0]);
-            if (node != null) RefreshItem(node);
+            if (node != null) 
+                RefreshItem(node);
         }
 
-        void m_ShellListener_ItemUpdated(object sender, ShellItemEventArgs e)
+        private void m_ShellListener_ItemUpdated(object sender, ShellItemEventArgs e)
         {
             TreeNode parent = FindItem(e.Item.Parent, m_TreeView.Nodes[0]);
-            if (parent != null) RefreshItem(parent);
+            if (parent != null) 
+                RefreshItem(parent);
         }
 
-        void m_ShellView_Navigated(object sender, EventArgs e)
+        private void m_ShellView_Navigated(object sender, EventArgs e)
         {
             if (!m_Navigating)
             {
@@ -741,12 +725,14 @@ namespace GongSolutions.Shell
             }
         }
 
-        enum ScrollDirection
+        private enum ScrollDirection
         {
-            None = -1, Up, Down
+            None = -1, 
+            Up, 
+            Down
         }
 
-        class DragTarget : IDisposable
+        private class DragTarget : IDisposable
         {
             public DragTarget(TreeNode node,
                               int keyState, Point pt,
@@ -768,6 +754,7 @@ namespace GongSolutions.Shell
                 }
                 catch (Exception)
                 {
+                    // ignored
                 }
             }
 
@@ -777,10 +764,7 @@ namespace GongSolutions.Shell
                 m_Node.ForeColor = m_Node.TreeView.ForeColor;
                 m_DragExpandTimer.Dispose();
 
-                if (m_DropTarget != null)
-                {
-                    m_DropTarget.DragLeave();
-                }
+                m_DropTarget?.DragLeave();
             }
 
             public void DragOver(int keyState, Point pt, ref int effect)
@@ -801,23 +785,17 @@ namespace GongSolutions.Shell
                 m_DropTarget.Drop(data, keyState, pt, ref effect);
             }
 
-            public ShellItem Folder
-            {
-                get { return (ShellItem)m_Node.Tag; }
-            }
+            private ShellItem Folder => (ShellItem)m_Node.Tag;
 
-            public TreeNode Node
-            {
-                get { return m_Node; }
-            }
+            public TreeNode Node => m_Node;
 
             public static ComTypes.IDataObject Data
             {
-                get { return m_Data; }
-                set { m_Data = value; }
+                get => m_Data;
+                set => m_Data = value;
             }
 
-            void m_DragExpandTimer_Tick(object sender, EventArgs e)
+            private void m_DragExpandTimer_Tick(object sender, EventArgs e)
             {
                 m_Node.Expand();
                 m_DragExpandTimer.Stop();

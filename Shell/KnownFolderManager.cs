@@ -15,8 +15,7 @@ namespace GongSolutions.Shell
         {
             if (Environment.OSVersion.Version.Major >= 6)
             {
-                m_ComInterface = (IKnownFolderManager)
-                    new CoClass.KnownFolderManager();
+                m_ComInterface = (IKnownFolderManager)new CoClass.KnownFolderManager();
             }
             else
             {
