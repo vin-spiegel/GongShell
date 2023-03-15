@@ -487,6 +487,26 @@ namespace GongSolutions.Shell
         [Category("Custom")]
         [DefaultValue(null)]
         public ContextMenuStrip ItemContextMenuStrip { get; set; }
+
+        /// <summary>
+        /// NoColumnHeader
+        /// </summary>
+        [DefaultValue(false), Category("Appearance")]
+        public bool NoColumnHeader 
+        {
+            get => m_NoColumnHeader;
+            set
+            {
+                if (value == m_NoColumnHeader) 
+                    return;
+                
+                m_NoColumnHeader = value;
+                m_Browser = null;
+                RecreateShellView();
+                OnNavigated();
+            }
+        }
+        
         /// <summary>
         /// Gets a value indicating whether a new folder can be created in
         /// the folder currently being browsed by th <see cref="ShellView"/>.
@@ -912,6 +932,11 @@ namespace GongSolutions.Shell
             // Set the FOLDERSETTINGS.
             folderSettings.ViewMode = (FOLDERVIEWMODE)m_View;
 
+            if (m_NoColumnHeader)
+            {
+                folderSettings.fFlags |= FOLDERFLAGS.NOCOLUMNHEADER;
+            }
+            
             if (!m_ShowWebView)
             {
                 folderSettings.fFlags |= FOLDERFLAGS.NOWEBVIEW;
@@ -1070,6 +1095,7 @@ namespace GongSolutions.Shell
         bool m_ShowWebView;
         ShellViewStyle m_View;
         PropertyChangedEventHandler m_PropertyChanged;
+        private bool m_NoColumnHeader;
     }
 
     /// <summary>
