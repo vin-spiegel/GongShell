@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Runtime.InteropServices;
 using ComTypes = System.Runtime.InteropServices.ComTypes;
 using GongSolutions.Shell.Interop;
+// ReSharper disable NotAccessedVariable
 
 namespace GongSolutions.Shell
 {
@@ -285,37 +288,47 @@ namespace GongSolutions.Shell
         /// <param name="filter">
         /// A filter describing the types of child items to be included.
         /// </param>
-        /// 
+        /// <param name="filterFunc">
+        /// A delegate function for filtering
+        /// </param>
         /// <returns>
         /// An enumerator over all child items.
         /// </returns>
-        public IEnumerator<ShellItem> GetEnumerator(SHCONTF filter)
+        public IEnumerator<ShellItem> GetEnumerator(SHCONTF filter, Func<ShellItem, bool> filterFunc = null)
         {
-            IShellFolder folder = GetIShellFolder();
-            IEnumIDList enumId = GetIEnumIDList(folder, filter);
-            uint count;
-            IntPtr pidl;
-            HResult result;
+            var folder = GetIShellFolder();
+            var enumId = GetIEnumIDList(folder, filter);
 
             if (enumId == null)
             {
                 yield break;
             }
 
-            result = enumId.Next(1, out pidl, out count);
-            while (result == HResult.S_OK)
-            {
-                yield return new ShellItem(this, pidl);
-                Shell32.ILFree(pidl);
-                result = enumId.Next(1, out pidl, out count);
-            }
+            var result = enumId.Next(1, out var pidl, out var count);
 
-            if (result != HResult.S_FALSE)
+            try
             {
-                Marshal.ThrowExceptionForHR((int)result);
-            }
+                while (result == HResult.S_OK)
+                {
+                    var item = new ShellItem(this, pidl);
 
-            yield break;
+                    if (filterFunc == null || filterFunc(item))
+                    {
+                        yield return item;
+                    }
+                    Shell32.ILFree(pidl);
+                    result = enumId.Next(1, out pidl, out count);
+                }
+
+                if (result != HResult.S_FALSE)
+                {
+                    Marshal.ThrowExceptionForHR((int)result);
+                }
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(enumId);
+            }
         }
 
         /// <summary>
