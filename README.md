@@ -34,12 +34,11 @@ namespace ConsoleApplication1
 }    
 ```
 
-I also added a few [unfficial features](https://stackoverflow.com/questions/75519245/is-it-possible-to-turn-off-contextmenu-option-in-gong-shell-listview/75524366?noredirect=1#comment133260561_75524366).
+I also added a few [unofficial features](https://stackoverflow.com/questions/75519245/is-it-possible-to-turn-off-contextmenu-option-in-gong-shell-listview/75524366?noredirect=1#comment133260561_75524366).
 
 ![contextmenu](./Tutorial/contextmenu1.png)
 
-You can easily set custom context menu when event arise.
-
+1. enable window context menu
 ```cs
 var shellView = new ShellView();
 shellView.CustomContextMenuEnable = true;
