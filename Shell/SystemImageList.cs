@@ -29,8 +29,11 @@ namespace GongSolutions.Shell
 
         public static void UseSystemImageList(ListView control)
         {
-            control.LargeImageList ??= new ImageList();
-            control.SmallImageList ??= new ImageList();
+            if (control.LargeImageList == null) 
+                control.LargeImageList = new ImageList();
+            
+            if (control.SmallImageList == null) 
+                control.SmallImageList = new ImageList();
 
             Shell32.FileIconInit(true);
             if (!Shell32.Shell_GetImageLists(out var large, out var small))

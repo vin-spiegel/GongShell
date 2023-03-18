@@ -457,7 +457,11 @@ namespace GongSolutions.Shell
                 }
             }
 
-            return result ??= parent.Nodes.Add(displayName);
+            if (result == null)
+            {
+                result = parent.Nodes.Add(displayName);
+            }
+            return result;
         }
 
         private bool ShouldShowHidden()

@@ -1017,7 +1017,11 @@ namespace GongSolutions.Shell
 
         private IShellBrowser GetShellBrowser()
         {
-            return m_Browser ??= m_ShowWebView ? new ShellBrowser(this) : new DialogShellBrowser(this);
+            if (m_Browser == null)
+            {
+                m_Browser = m_ShowWebView ? new ShellBrowser(this) : new DialogShellBrowser(this);
+            }
+            return m_Browser;
         }
 
         private void OnNavigated()
