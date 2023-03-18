@@ -59,19 +59,11 @@ namespace GongSolutions.Shell
             _cached = null;
             RefreshContent();
         }
-
-        public static string GetCallingFunctionName()
-        {
-            StackTrace stackTrace = new StackTrace();
-            string callingFunction = stackTrace.GetFrame(2).GetMethod().Name;
-            return callingFunction;
-        }
         
         public void RefreshContent()
         {
             try
             {
-
                 if (_shellView.SelectedItems.Length == 0)
                 {
                     DrawString("파일을 선택해주세요.");
@@ -94,35 +86,9 @@ namespace GongSolutions.Shell
 
                 _cached = item;
             }
-            catch (InvalidOperationException ex)
-            {
-                // DrawString(_localService.GetStrings("Select_Files"));
-                Console.WriteLine($@"{GetCallingFunctionName()}, {ex}");
-                DrawString("파일을 선택해주세요.");
-            }
-            catch (FileNotFoundException ex)
-            {
-                // DrawString(_localService.GetStrings("Select_Files"));
-                DrawString("파일을 선택해주세요.");
-            }
-            catch (ArgumentException ex)
-            {
-                DrawString("미리 볼 수 없습니다.");
-            }
-            catch (NullReferenceException ex)
-            {
-                // NullReferenceException에선 LocalizationService초기화를 다시해야함.
-                // _localService = new LocalizationService();
-                // DrawString(_localService.GetStrings("Cannot_Preview"));
-                DrawString("미리 볼 수 없습니다.");
-            }
-            catch (IndexOutOfRangeException ex)
-            {
-                DrawString("미리 볼 수 없습니다.");
-            }
             catch (Exception ex)
             {
-                DrawString("미리 볼 수 없습니다.");
+                HandleException(ex);
             }
             finally
             {
@@ -130,7 +96,44 @@ namespace GongSolutions.Shell
                     SetImageSizeAndLocation();
             }
         }
+        
+        private void HandleException(Exception ex)
+        {
+            string message;
 
+            switch (ex)
+            {
+                case InvalidOperationException _:
+                case FileNotFoundException _:
+                {
+                    message = "파일을 선택해주세요.";
+                    break;
+                }
+                case ArgumentException _:
+                case NullReferenceException _:
+                case IndexOutOfRangeException _:
+                {
+                    message = "미리 볼 수 없습니다.";
+                    break;
+                }
+                default:
+                {
+                    message = "미리 볼 수 없습니다.";
+                    break;
+                }
+            }
+
+            Console.WriteLine($@"{GetCallingFunctionName()}, {ex}");
+            DrawString(message);
+        }
+        
+        public static string GetCallingFunctionName()
+        {
+            StackTrace stackTrace = new StackTrace();
+            string callingFunction = stackTrace.GetFrame(2).GetMethod().Name;
+            return callingFunction;
+        }
+        
         private void LoadImage(string filePath)
         {
             using (var memStream = new MemoryStream())
