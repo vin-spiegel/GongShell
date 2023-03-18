@@ -826,6 +826,9 @@ namespace GongSolutions.Shell
 
         static IShellItem CreateItemWithParent(ShellItem parent, IntPtr pidl)
         {
+            if (parent == null || pidl == IntPtr.Zero)
+                return null;
+
             if (RunningVista)
             {
                 return Shell32.SHCreateItemWithParent(IntPtr.Zero,
