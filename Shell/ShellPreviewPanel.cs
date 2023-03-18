@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 // ReSharper disable ConvertToUsingDeclaration
+#pragma warning disable CS1591
 
 namespace GongSolutions.Shell
 {
@@ -28,7 +29,7 @@ namespace GongSolutions.Shell
             _pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
             this.Controls.Add(_pictureBox);
         }
-        
+
         /// <summary>
         /// Gets or sets the ShellView associated with this ShellPreviewPanel.
         /// </summary>
@@ -56,12 +57,6 @@ namespace GongSolutions.Shell
         {
             _pictureBox.Image = null;
             _cached = null;
-            RefreshContent();
-        }
-
-        protected override void OnResize(EventArgs eventargs)
-        {
-            base.OnResize(eventargs);
             RefreshContent();
         }
 
@@ -94,25 +89,7 @@ namespace GongSolutions.Shell
 
                 if (item != null)
                 {
-                    using (var memStream = new MemoryStream())
-                    using (var stream = new FileStream(item.ParsingName, FileMode.Open, FileAccess.Read,
-                               FileShare.ReadWrite))
-                    {
-                        stream.CopyTo(memStream);
-                        memStream.Seek(0, SeekOrigin.Begin);
-                        var image = Image.FromStream(memStream);
-
-                        if (Path.GetExtension(item.DisplayName).Equals("gif"))
-                        {
-                            var gifThumbnail = image.GetThumbnailImage(image.Width, image.Height, null, IntPtr.Zero);
-                            _pictureBox.Image = gifThumbnail;
-                        }
-                        else
-                        {
-                            _pictureBox.Image = image;
-                        }
-                    }
-
+                    LoadImage(item.ParsingName);
                 }
 
                 _cached = item;
@@ -240,5 +217,21 @@ namespace GongSolutions.Shell
                 _pictureBox.Parent.ClientSize.Width / 2 - _pictureBox.Size.Width / 2,
                 _pictureBox.Parent.ClientSize.Height / 2 - _pictureBox.Size.Height / 2);
         }
+
+        #region Winform Event
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            RefreshContent();
+            base.OnPaint(e);
+        }
+        
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            this.Invalidate();
+        }
+
+        #endregion
     }
 }
