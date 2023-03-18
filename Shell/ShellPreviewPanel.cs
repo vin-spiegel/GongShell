@@ -100,7 +100,17 @@ namespace GongSolutions.Shell
                     {
                         stream.CopyTo(memStream);
                         memStream.Seek(0, SeekOrigin.Begin);
-                        _pictureBox.Image = Image.FromStream(memStream);
+                        var image = Image.FromStream(memStream);
+
+                        if (Path.GetExtension(item.DisplayName).Equals("gif"))
+                        {
+                            var gifThumbnail = image.GetThumbnailImage(image.Width, image.Height, null, IntPtr.Zero);
+                            _pictureBox.Image = gifThumbnail;
+                        }
+                        else
+                        {
+                            _pictureBox.Image = image;
+                        }
                     }
 
                 }
@@ -144,8 +154,27 @@ namespace GongSolutions.Shell
             }
         }
 
-        private string _currentMessage;
-        private bool _initialized;
+        private void LoadImage(string filePath)
+        {
+            using (var memStream = new MemoryStream())
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read,
+                       FileShare.ReadWrite))
+            {
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                var image = Image.FromStream(memStream);
+
+                if (Path.GetExtension(filePath).Equals(".gif"))
+                {
+                    var gifThumbnail = image.GetThumbnailImage(image.Width, image.Height, null, IntPtr.Zero);
+                    _pictureBox.Image = gifThumbnail;
+                }
+                else
+                {
+                    _pictureBox.Image = image;
+                }
+            }
+        }
 
         private void DrawString(string message)
         {
