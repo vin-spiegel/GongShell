@@ -47,6 +47,12 @@ namespace GongSolutions.Shell
             m_TreeView.HotTracking = true;
             m_TreeView.Parent = this;
             m_TreeView.ShowRootLines = false;
+            m_TreeView.ItemHeight = 24;
+            m_TreeView.FullRowSelect = true;
+            m_TreeView.ShowLines = false;
+            m_TreeView.ShowPlusMinus = false;
+            m_TreeView.Indent = 10;
+            
             m_TreeView.AfterSelect += new TreeViewEventHandler(m_TreeView_AfterSelect);
             m_TreeView.BeforeExpand += new TreeViewCancelEventHandler(m_TreeView_BeforeExpand);
             m_TreeView.ItemDrag += new ItemDragEventHandler(m_TreeView_ItemDrag);
@@ -231,9 +237,7 @@ namespace GongSolutions.Shell
 
         #region IDropTarget Members
 
-        void Interop.IDropTarget.DragEnter(ComTypes.IDataObject pDataObj,
-                                           int grfKeyState, Point pt,
-                                           ref int pdwEffect)
+        void Interop.IDropTarget.DragEnter(ComTypes.IDataObject pDataObj, int grfKeyState, Point pt, ref int pdwEffect)
         {
             Point clientLocation = m_TreeView.PointToClient(pt);
             TreeNode node = m_TreeView.HitTest(clientLocation).Node;
@@ -333,6 +337,7 @@ namespace GongSolutions.Shell
             try
             {
                 m_TreeView.Nodes.Clear();
+                
                 CreateItem(null, m_RootFolder);
 
                 m_TreeView.Nodes[0].Expand();
@@ -349,11 +354,13 @@ namespace GongSolutions.Shell
             var displayName = folder.DisplayName;
 
             // invoke filter Item Event
-            FilterItemEventArgs e = new FilterItemEventArgs(folder);
-            m_FilterItem?.Invoke(this, e);
+            {
+                FilterItemEventArgs e = new FilterItemEventArgs(folder);
+                m_FilterItem?.Invoke(this, e);
 
-            if (!e.Include)
-                return;
+                if (!e.Include)
+                    return;
+            }
 
             var node = parent != null ? InsertNode(parent, folder, displayName) : m_TreeView.Nodes.Add(displayName);
 

@@ -14,6 +14,22 @@ namespace ShellExplorer
         public ShellExplorer()
         {
             InitializeComponent();
+            treeView.FilterItem += ShellViewOnFilterItem;
+            shellView.FilterItem += ShellViewOnFilterItem;
+
+            _previewPanel = new ShellPreviewPanel();
+            _previewPanel.Dock = DockStyle.Fill;
+            _previewPanel.ShellView = shellView;
+            splitContainer2.Panel2.Controls.Add(_previewPanel);
+            splitContainer2.SplitterDistance = (int)(splitContainer2.Width * 0.7);
+        }
+
+        private void ShellViewOnFilterItem(object sender, FilterItemEventArgs e)
+        {
+            if (e.Item.DisplayName.StartsWith("."))
+            {
+                e.Include = false;
+            }
         }
 
         protected override void WndProc(ref Message m)
@@ -119,5 +135,6 @@ namespace ShellExplorer
         }
 
         ShellContextMenu m_ContextMenu;
+        private readonly ShellPreviewPanel _previewPanel;
     }
 }

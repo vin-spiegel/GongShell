@@ -22,12 +22,10 @@ namespace ShellExplorer {
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent() {
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ShellExplorer));
-            this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.treeView = new GongSolutions.Shell.ShellTreeView();
-            this.shellView = new GongSolutions.Shell.ShellView();
             this.statusBar = new System.Windows.Forms.StatusBar();
             this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
             this.fileMenu = new System.Windows.Forms.MenuItem();
@@ -42,70 +40,35 @@ namespace ShellExplorer {
             this.upButton = new System.Windows.Forms.ToolBarButton();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.shellComboBox1 = new GongSolutions.Shell.ShellComboBox();
-            this.splitContainer.Panel1.SuspendLayout();
-            this.splitContainer.Panel2.SuspendLayout();
-            this.splitContainer.SuspendLayout();
+            this.shellView = new GongSolutions.Shell.ShellView();
+            this.treeView = new GongSolutions.Shell.ShellTreeView();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // splitContainer
-            // 
-            this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer.Location = new System.Drawing.Point(0, 51);
-            this.splitContainer.Name = "splitContainer";
-            // 
-            // splitContainer.Panel1
-            // 
-            this.splitContainer.Panel1.Controls.Add(this.treeView);
-            // 
-            // splitContainer.Panel2
-            // 
-            this.splitContainer.Panel2.Controls.Add(this.shellView);
-            this.splitContainer.Size = new System.Drawing.Size(610, 224);
-            this.splitContainer.SplitterDistance = 197;
-            this.splitContainer.TabIndex = 1;
-            // 
-            // treeView
-            // 
-            this.treeView.AllowDrop = true;
-            this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView.Location = new System.Drawing.Point(0, 0);
-            this.treeView.Name = "treeView";
-            this.treeView.ShellView = this.shellView;
-            this.treeView.Size = new System.Drawing.Size(197, 224);
-            this.treeView.TabIndex = 0;
-            this.treeView.Text = "shellTreeView1";
-            // 
-            // shellView
-            // 
-            this.shellView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.shellView.Location = new System.Drawing.Point(0, 0);
-            this.shellView.Name = "shellView";
-            this.shellView.Size = new System.Drawing.Size(409, 224);
-            this.shellView.StatusBar = this.statusBar;
-            this.shellView.TabIndex = 0;
-            this.shellView.Text = "shellView1";
-            this.shellView.View = GongSolutions.Shell.ShellViewStyle.Details;
-            this.shellView.Navigated += new System.EventHandler(this.shellView_Navigated);
             // 
             // statusBar
             // 
-            this.statusBar.Location = new System.Drawing.Point(0, 275);
+            this.statusBar.Location = new System.Drawing.Point(0, 638);
             this.statusBar.Name = "statusBar";
             this.statusBar.ShowPanels = true;
-            this.statusBar.Size = new System.Drawing.Size(610, 22);
+            this.statusBar.Size = new System.Drawing.Size(961, 22);
             this.statusBar.TabIndex = 1;
             // 
             // mainMenu
             // 
-            this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.fileMenu,
-            this.viewMenu});
+            this.mainMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.fileMenu, this.viewMenu });
             // 
             // fileMenu
             // 
             this.fileMenu.Index = 0;
-            this.fileMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.dummyMenuItem});
+            this.fileMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.dummyMenuItem });
             this.fileMenu.Text = "&File";
             this.fileMenu.Popup += new System.EventHandler(this.fileMenu_Popup);
             // 
@@ -118,8 +81,7 @@ namespace ShellExplorer {
             // viewMenu
             // 
             this.viewMenu.Index = 1;
-            this.viewMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.refreshMenu});
+            this.viewMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.refreshMenu });
             this.viewMenu.Text = "&View";
             // 
             // refreshMenu
@@ -132,16 +94,13 @@ namespace ShellExplorer {
             // toolBar
             // 
             this.toolBar.Appearance = System.Windows.Forms.ToolBarAppearance.Flat;
-            this.toolBar.Buttons.AddRange(new System.Windows.Forms.ToolBarButton[] {
-            this.backButton,
-            this.forwardButton,
-            this.upButton});
+            this.toolBar.Buttons.AddRange(new System.Windows.Forms.ToolBarButton[] { this.backButton, this.forwardButton, this.upButton });
             this.toolBar.DropDownArrows = true;
             this.toolBar.ImageList = this.imageList;
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
             this.toolBar.ShowToolTips = true;
-            this.toolBar.Size = new System.Drawing.Size(610, 28);
+            this.toolBar.Size = new System.Drawing.Size(961, 28);
             this.toolBar.TabIndex = 2;
             this.toolBar.ButtonClick += new System.Windows.Forms.ToolBarButtonClickEventHandler(this.toolBar_ButtonClick);
             // 
@@ -186,17 +145,69 @@ namespace ShellExplorer {
             this.shellComboBox1.Editable = true;
             this.shellComboBox1.Location = new System.Drawing.Point(0, 28);
             this.shellComboBox1.Name = "shellComboBox1";
-            this.shellComboBox1.ShellView = this.shellView;
-            this.shellComboBox1.Size = new System.Drawing.Size(610, 23);
+            this.shellComboBox1.Size = new System.Drawing.Size(961, 23);
             this.shellComboBox1.TabIndex = 3;
             this.shellComboBox1.Text = "shellComboBox1";
+            // 
+            // shellView
+            // 
+            this.shellView.CustomContextMenuEnable = false;
+            this.shellView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.shellView.Location = new System.Drawing.Point(0, 0);
+            this.shellView.Name = "shellView";
+            this.shellView.Size = new System.Drawing.Size(259, 587);
+            this.shellView.StatusBar = this.statusBar;
+            this.shellView.TabIndex = 4;
+            this.shellView.Text = "shellView1";
+            this.shellView.View = GongSolutions.Shell.ShellViewStyle.Details;
+            // 
+            // treeView
+            // 
+            this.treeView.AllowDrop = true;
+            this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView.Location = new System.Drawing.Point(0, 0);
+            this.treeView.Name = "treeView";
+            this.treeView.ShellView = this.shellView;
+            this.treeView.Size = new System.Drawing.Size(178, 587);
+            this.treeView.TabIndex = 5;
+            this.treeView.Text = "shellTreeView1";
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 51);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.treeView);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Size = new System.Drawing.Size(961, 587);
+            this.splitContainer1.SplitterDistance = 178;
+            this.splitContainer1.TabIndex = 6;
+            // 
+            // splitContainer2
+            // 
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.shellView);
+            this.splitContainer2.Size = new System.Drawing.Size(779, 587);
+            this.splitContainer2.SplitterDistance = 259;
+            this.splitContainer2.TabIndex = 0;
             // 
             // ShellExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(610, 297);
-            this.Controls.Add(this.splitContainer);
+            this.ClientSize = new System.Drawing.Size(961, 660);
+            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.shellComboBox1);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.toolBar);
@@ -206,19 +217,22 @@ namespace ShellExplorer {
             this.Name = "ShellExplorer";
             this.Text = "Shell Explorer";
             this.ResizeEnd += new System.EventHandler(this.ShellExplorer_ResizeEnd);
-            this.splitContainer.Panel1.ResumeLayout(false);
-            this.splitContainer.Panel2.ResumeLayout(false);
-            this.splitContainer.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
+        private System.Windows.Forms.SplitContainer splitContainer2;
 
-        private GongSolutions.Shell.ShellTreeView treeView;
-        private System.Windows.Forms.SplitContainer splitContainer;
-        private GongSolutions.Shell.ShellView shellView;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+
+        #endregion
         private System.Windows.Forms.StatusBar statusBar;
         private System.Windows.Forms.MainMenu mainMenu;
         private System.Windows.Forms.MenuItem fileMenu;
@@ -233,6 +247,8 @@ namespace ShellExplorer {
         private System.Windows.Forms.MenuItem viewMenu;
         private System.Windows.Forms.MenuItem refreshMenu;
         private GongSolutions.Shell.ShellComboBox shellComboBox1;
+        private GongSolutions.Shell.ShellView shellView;
+        private GongSolutions.Shell.ShellTreeView treeView;
     }
 }
 

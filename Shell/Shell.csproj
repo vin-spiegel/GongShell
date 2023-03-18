@@ -118,6 +118,7 @@
     <Compile Include="ShellNotificationListener.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ShellPreviewPanel.cs" />
     <Compile Include="ShellTreeView.cs">
       <SubType>Component</SubType>
     </Compile>

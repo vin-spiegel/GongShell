@@ -1145,3 +1145,4 @@ namespace GongSolutions.Shell
     public delegate void NavigatingEventHandler(object sender,
         NavigatingEventArgs e);
 }
+
