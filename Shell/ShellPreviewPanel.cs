@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,10 +7,57 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 // ReSharper disable ConvertToUsingDeclaration
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable StaticMemberInGenericType
+#pragma warning disable CS0414
 #pragma warning disable CS1591
 
 namespace GongSolutions.Shell
 {
+    // TODO: static 덜어내고 생성해서 쓰기.
+    public class CachedObject<T>
+    {
+        private static readonly Stack<CachedObject<T>> _pool = new Stack<CachedObject<T>>();
+        private static readonly object _lock = new object();
+
+        public string Name { get; set; }
+        public T Object { get; set; }
+
+        private CachedObject(string name, T obj)
+        {
+            Name = name;
+            Object = obj;
+        }
+
+        public static CachedObject<T> Get(string parsingName, T obj)
+        {
+            lock (_lock)
+            {
+                if (_pool.Count > 0)
+                {
+                    var cachedObject = _pool.Pop();
+                    cachedObject.Name = parsingName;
+                    cachedObject.Object = obj;
+                    return cachedObject;
+                }
+                else
+                {
+                    return new CachedObject<T>(parsingName, obj);
+                }
+            }
+        }
+
+        public void ReturnToPool()
+        {
+            lock (_lock)
+            {
+                _pool.Push(this);
+            }
+        }
+    }
+    
     /// <summary>
     /// The ShellPreviewPanel class is a custom Panel derived from the standard Panel control.
     /// This class is intended to provide a specialized panel for displaying shell preview content.
@@ -18,8 +66,11 @@ namespace GongSolutions.Shell
     {
         private ShellView _shellView;
         private readonly PictureBox _pictureBox = new PictureBox();
-        private ShellItem _cached;
+        private CachedObject<Image> _cached;
         // private LocalizationService _localService;
+
+        private readonly string SELECT_FILES = "파일을 선택해주세요.";
+        private readonly string CANNOT_PREVIEW = "미리 볼 수 없습니다.";
         
         private void InitializeComponent()
         {
@@ -64,34 +115,51 @@ namespace GongSolutions.Shell
         {
             try
             {
-                var items = _shellView.SelectedItems;
-                var length = items.Length;
-                
-                if (length == 0)
+                var item = _shellView.SelectedItems?.Last();
+
+                if (item == null)
+                    throw new Exception();
+
+                if (_cached?.Name == item.ParsingName)
                 {
-                    DrawString("파일을 선택해주세요.");
+                    _pictureBox.Image = _cached?.Object;
                     return;
                 }
-                else
+
+                ClearString();
+
+                using (var stream = new FileStream(item.ParsingName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var bufferedStream = new BufferedStream(stream))
                 {
-                    ClearString();
+                    if (_cached?.Name == item.ParsingName) // 이미 캐시된 파일인 경우
+                    {
+                        _pictureBox.Image = _cached?.Object;
+                    }
+                    else
+                    {
+                        var image = new Bitmap(bufferedStream);
+                        _pictureBox.Image = image;
+                        _cached?.ReturnToPool(); // 이미 사용한 CachedFile 객체를 다시 객체 풀에 반환
+                        _cached = CachedObject<Image>.Get(item.ParsingName, image); // 새로운 CachedFile 객체를 가져오거나, 객체 풀에서 재사용합니다.
+                    }
                 }
-            
-                var item = items[length - 1];
-                
-                if (_cached == item)
-                    return;
-                
-                if (item != null)
-                {
-                    LoadImage(item.ParsingName);
-                }
-                
-                _cached = item;
+            }
+            catch (InvalidOperationException ex)
+            {
+                DrawString(SELECT_FILES);
+                // DrawString(_localService.GetStrings("Select_Files"));
+            }
+            catch (FileNotFoundException ex)
+            {
+                DrawString(SELECT_FILES);
+                // DrawString(_localService.GetStrings("Select_Files"));
             }
             catch (Exception ex)
             {
-                HandleException(ex);
+                DrawString(CANNOT_PREVIEW);
+                // NullReferenceException에선 LocalizationService초기화를 다시해야함.
+                // _localService = new LocalizationService();
+                // DrawString(_localService.GetStrings("Cannot_Preview"));
             }
             finally
             {

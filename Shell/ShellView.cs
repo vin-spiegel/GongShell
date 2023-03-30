@@ -619,7 +619,8 @@ namespace GongSolutions.Shell
                                 (IntPtr)(storage.unionmember + offset));
                         }
 
-                        GlobalFree(storage.unionmember);
+                        // global memory block 이어야 함.
+                        // GlobalFree(storage.unionmember);
                         return result;
                     }
                 }
